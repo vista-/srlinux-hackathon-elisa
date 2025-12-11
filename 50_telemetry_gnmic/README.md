@@ -263,15 +263,17 @@ $ gnmic -a clab-hackathon-leaf1,clab-hackathon-spine1 subscribe --stream-mode SA
 
 So far, we ran gNMIc as an interactive CLI tool. However, we can also start gNMIc as a server, exposing the data it collects to other services, in various formats! To do this, we will need to modify the configuration, and add some additional details:
 - A list of [targets](https://gnmic.openconfig.net/user_guide/targets/targets/) to automatically subscribe to
-- A list of [subscriptions](https://gnmic.openconfig.net/user_guide/subscriptions/) that can be assigned to targets
+- A list of [subscriptions](https://gnmic.openconfig.net/user_guide/subscriptions/) for paths, that can be assigned to targets
 - An [output](https://gnmic.openconfig.net/user_guide/outputs/prometheus_output/) to expose
 
 Let's create a configuration that connects to all SR Linux devices in our network, collects every 5 seconds in sample stream mode interface operational state, traffic-rate and statistics paths, and outputs to a Prometheus scrape endpoint, which should run on port 9273!
 
+Use the [SR Linux YANG Browser](https://yang.srlinux.dev/v25.10.1) to help you find the correct YANG paths. 
+
 <details>
 <summary>Task 50.3 solution</summary>
 
-```
+```yaml
 username: admin
 password: NokiaSrl1!
 port: 57400
@@ -311,7 +313,61 @@ outputs:
 Start the gNMIc server with `gnmic subscribe`
 </details>
 
-You should be able to hit the Prometheus scrape endpoint with `curl http://localhost:9273/metrics` and see your switches' metrics there!
+You should be able to hit the Prometheus scrape endpoint with `curl http://localhost:9273/metrics` and see your switches' metrics there! Don't be alarmed if the operational state is missing, though...
+
+## Task 50.4: Processors
+
+Try to look in the metrics output for the operational state! Even if you found the right path in the previous task, you won't be able to see it... Recall the manual commands we ran, scroll up in your terminal to see the format of the operational status (or check the solution): it's a string!
+
+Prometheus does not have a "string" metric type, but rather requires all metrics to be some form of number (integer or floating-point number).
+
+Thankfully, we can use _processors_ to pre-process our telemetry data before outputting it. The [string replace processor](https://gnmic.openconfig.net/user_guide/event_processors/event_strings/#replace) can do our work for us, replace "down" with "0" and "up" with "1".
+
+To apply a processor on an output, it must be [referenced in it](https://gnmic.openconfig.net/user_guide/event_processors/intro/#linking-an-event-processor-to-an-output).
+
+<details>
+<summary>Task 50.4 solution</summary>
+
+```yaml
+# ...
+processors:
+  replace-operstate:
+    event-strings:
+      value-names:
+        - ".*"
+      transforms:
+        - replace:
+            apply-on: "value"
+            old: "down"
+            new: "0"
+        - replace:
+            apply-on: "value"
+            old: "up"
+            new: "1"
+
+outputs:
+  prom-output:
+    type: prometheus
+    listen: :9273
+    event-processors:
+      - replace-operstate
+```
+
+</details>
+
+We can now see the oper-state metrics if we `curl` again:
+
+```
+$ curl http://localhost:9273/metrics 
+# HELP srl_nokia_interfaces_interface_oper_state gNMIc generated metric
+# TYPE srl_nokia_interfaces_interface_oper_state untyped
+srl_nokia_interfaces_interface_oper_state{interface_name="ethernet-1/1",source="clab-hackathon-leaf1",subscription_name="srl-if-stats"} 1
+srl_nokia_interfaces_interface_oper_state{interface_name="ethernet-1/1",source="clab-hackathon-leaf2",subscription_name="srl-if-stats"} 1
+srl_nokia_interfaces_interface_oper_state{interface_name="ethernet-1/1",source="clab-hackathon-spine1",subscription_name="srl-if-stats"} 1
+srl_nokia_interfaces_interface_oper_state{interface_name="ethernet-1/1",source="clab-hackathon-spine2",subscription_name="srl-if-stats"} 1
+srl_nokia_interfaces_interface_oper_state{interface_name="ethernet-1/10",source="clab-hackathon-leaf1",subscription_name="srl-if-stats"} 0
+srl_nokia_interfaces_interface_oper_state{interface_name="ethernet-1/10",source="clab-hackathon-leaf2",subscription_name="srl-if-stats"} 0
+```
 
 ## Task 50.4: Putting gNMIc server into our topology
 

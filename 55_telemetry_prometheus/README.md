@@ -28,6 +28,8 @@ topology:
       image: prom/prometheus:v3.8.0
       binds:
         - config/prometheus.yml:/etc/prometheus/prometheus.yml
+      ports:
+        - 9090
 #   ...
 ```
 

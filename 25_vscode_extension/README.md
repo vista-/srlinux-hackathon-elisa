@@ -24,7 +24,6 @@ Below the running labs section is the undeployed labs one.
     
 ![VS Code containerlab topology](../images/clab_vscode_topo.png)
 
-
 The Containerlab VS Code extension also allows you to edit the topology, let's take advantage of that!
 
 > [!IMPORTANT]
