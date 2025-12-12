@@ -115,7 +115,7 @@ Your configuration is persisted to disk under the `/etc/opt/srlinux/config.json`
 
 Let's take a quick look our working directory, on the host!
 
-You can notice that a new directory prefixed with `clab-` has been created. This is called the _lab directory_, and is created on the first deployment of a topology by Containerlab. For node kinds that support it (such as SR Linux), this is where the state of the network OS is persisted between deployments.
+You can notice that a new directory prefixed with `clab-` has been created. This is called the _lab directory_, and is created on the first deployment of a topology by Containerlab. For node kinds that support it (such as SR Linux), this is where the state of the network OS is persisted between deployments. Using the `-c` command-line flag in `clab deploy` and `clab destroy` commands removes the lab directory created by Containerlab on lab deployment.
     
 For example, take a look at the `clab-workshop/leaf1/config/config.json` file:
 
@@ -136,11 +136,7 @@ This is exactly the file that you would see on the SR Linux node `leaf1` under t
 
 Many other NOSes also support saving the node configuration to the lab directory with the `containerlab save` command.
 
-However, packaging the entire lab directory is undesired, as it can contain much more state than normally needed to recover the NOSes state - normally, all you need is a startup-config. 
-    
-Using the `-c` command-line flag in `clab deploy` and `clab destroy` commands removes the lab directory created by Containerlab on lab deployment, so let's use the `containerlab destroy -c` command to destroy the topology and remove the lab directory!
-    
-Once you are done with adding the startup configuration files to the topology, it's time to redeploy again! Pinging should still work :)
+However, packaging the entire lab directory is undesired, as it can contain much more state than normally needed to recover the NOSes state - normally, all you need is a startup-config!
 
 ## Task 12.4: Adding startup configs to your lab topology
 
@@ -177,7 +173,9 @@ topology:
 ```
 
 **Your next task is to re-deploy the topology with the configuration used in the previous step now in the startup configuration files!**  
-The files should be stored in the `./config` directory, and a separate startup configuration file should be created for each SR Linux node.
+The files should be stored in the `./config` directory, and a separate startup configuration file should be created for each SR Linux node. The startup-config file, which contains eiter the CLI or hierarchical configuration format you want Containerlab to apply on top of the default management-plane configuration it applies, can be filled with the output of the `diff` commands mentioned above.
+    
+Once you are done with adding the startup configuration files to the topology, saving the files, and referencing them in the topology, it's time to redeploy again, but with the `-c` flag this time! Pinging should still work :)
 
 > [!IMPORTANT]
 > Before you deploy the topology again, you should **save your work**!
