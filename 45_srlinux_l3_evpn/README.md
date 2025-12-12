@@ -107,6 +107,7 @@ insert / interface irb0 subinterface 210 anycast-gw
 
 insert / network-instance l2-irb1 type mac-vrf
 insert / network-instance l2-irb1 interface ethernet-1/1.210
+insert / network-instance l2-irb1 interface irb0.210
 insert / network-instance l2-irb1 vxlan-interface vxlan0.210
 insert / network-instance l2-irb1 protocols bgp-evpn bgp-instance 1 vxlan-interface vxlan0.210
 insert / network-instance l2-irb1 protocols bgp-evpn bgp-instance 1 evi 210
@@ -122,6 +123,7 @@ insert / interface irb0 subinterface 211 ipv4 address 192.168.211.254/24 anycast
 insert / interface irb0 subinterface 211 anycast-gw
 
 insert / network-instance l2-irb2 type mac-vrf
+insert / network-instance l2-irb2 interface irb0.211
 insert / network-instance l2-irb2 vxlan-interface vxlan0.211
 insert / network-instance l2-irb2 protocols bgp-evpn bgp-instance 1 vxlan-interface vxlan0.211
 insert / network-instance l2-irb2 protocols bgp-evpn bgp-instance 1 evi 211
