@@ -303,7 +303,8 @@ A:root@leaf1# environment alias "show statistics" "info from state interface {in
 
 > [!TIP]  
 > If you want to reuse, do not forget to save your aliases  
-> Aliases are ephemeral unless saved to the environment file. Aliases are saved in a separate file from the configuration file.
+> Aliases are ephemeral unless saved to the environment file.  
+> Aliases are saved in a separate file from the configuration file.
 
 _Saving environment settings:_
 
