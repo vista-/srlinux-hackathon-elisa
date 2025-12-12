@@ -174,7 +174,7 @@ topology:
 
 **Your next task is to re-deploy the topology with the configuration used in the previous step now in the startup configuration files!**  
 The files should be stored in the `./config` directory, and a separate startup configuration file should be created for each SR Linux node. The startup-config file, which contains eiter the CLI or hierarchical configuration format you want Containerlab to apply on top of the default management-plane configuration it applies, can be filled with the output of the `diff` commands mentioned above.
-    
+
 Once you are done with adding the startup configuration files to the topology, saving the files, and referencing them in the topology, it's time to redeploy again, but with the `-c` flag this time! Pinging should still work :)
 
 > [!IMPORTANT]
